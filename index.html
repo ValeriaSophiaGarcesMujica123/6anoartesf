@@ -1,1 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Arte ou Não? - Verdadeiro ou Falso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+        }
 
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: #FFFDF5;
+            border-radius: 35px;
+            padding: 35px 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 0 8px #FFD93D, 0 0 0 16px #FF6B6B;
+            text-align: center;
+            position: relative;
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #4D96FF;
+            text-shadow: 3px 3px 0 #FFD93D;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #FF6B6B;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* Telas */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tela inicial */
+        .emoji-inicio {
+            font-size: 5rem;
+            margin: 15px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #6BCB77, #4CAF50);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.4rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 8px 0 #3A8A3E, 0 12px 15px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            font-family: inherit;
+            letter-spacing: 1px;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 11px 0 #3A8A3E, 0 15px 20px rgba(0,0,0,0.25);
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #3A8A3E, 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn-verdadeiro {
+            background: linear-gradient(145deg, #6BCB77, #4CAF50);
+            box-shadow: 0 8px 0 #3A8A3E, 0 12px 15px rgba(0,0,0,0.2);
+            font-size: 1.3rem;
+            padding: 20px 40px;
+        }
+
+        .btn-verdadeiro:active {
+            box-shadow: 0 3px 0 #3A8A3E;
+        }
+
+        .btn-falso {
+            background: linear-gradient(145deg, #FF6B6B, #E53935);
+            box-shadow: 0 8px 0 #B71C1C, 0 12px 15px rgba(0,0,0,0.2);
+            font-size: 1.3rem;
+            padding: 20px 40px;
+        }
+
+        .btn-falso:active {
+            box-shadow: 0 3px 0 #B71C1C;
+        }
+
+        .btn-reiniciar {
+            background: linear-gradient(145deg, #4D96FF, #1976D2);
+            box-shadow: 0 8px 0 #0D47A1, 0 12px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-reiniciar:active {
+            box-shadow: 0 3px 0 #0D47A1;
+        }
+
+        /* Tela do jogo */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #4D96FF;
+            padding: 12px 20px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 5px 0 #1976D2;
+        }
+
+        .placar {
+            background: #FFD93D;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+        }
+
+        .barra-progresso {
+            width: 100%;
+            height: 18px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 3px solid #4D96FF;
+        }
+
+        .barra-preenchida {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD93D, #6BCB77);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 7px;
+        }
+
+        .pergunta-box {
+            background: linear-gradient(145deg, #FFF9E6, #FFF3C4);
+            border: 5px dashed #FFD93D;
+            border-radius: 25px;
+            padding: 30px 20px;
+            margin-bottom: 25px;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pergunta-texto {
+            font-size: 1.3rem;
+            color: #333;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+
+        .botoes-resposta {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .botoes-resposta .btn {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        /* Feedback */
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+
+        .feedback.correto {
+            background: #C8E6C9;
+            color: #2E7D32;
+            animation: pulse 0.5s;
+        }
+
+        .feedback.errado {
+            background: #FFCDD2;
+            color: #C62828;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Tela final */
+        .resultado-emoji {
+            font-size: 5rem;
+            margin: 15px 0;
+            animation: bounce 1.5s infinite;
+        }
+
+        .resultado-titulo {
+            font-size: 2rem;
+            color: #4D96FF;
+            margin-bottom: 10px;
+        }
+
+        .resultado-placar {
+            font-size: 1.5rem;
+            color: #333;
+            margin: 15px 0;
+            background: #FFD93D;
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .resultado-msg {
+            font-size: 1.2rem;
+            color: #666;
+            margin: 20px 0;
+        }
+
+        .estrelas {
+            font-size: 2rem;
+            margin: 10px 0;
+            letter-spacing: 5px;
+        }
+
+        /* Responsivo */
+        @media (max-width: 500px) {
+            h1 { font-size: 1.6rem; }
+            .container { padding: 25px 18px; }
+            .pergunta-texto { font-size: 1.1rem; }
+            .btn { padding: 15px 30px; font-size: 1.1rem; }
+            .botoes-resposta .btn { min-width: 100px; font-size: 1rem; padding: 15px 20px; }
+            .top-bar { font-size: 0.85rem; padding: 10px 12px; }
+            .placar { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- TELA INICIAL -->
+        <div id="telaInicio" class="screen active">
+            <h1>🎨 Arte ou Não? 🖼️</h1>
+            <p class="subtitle">Verdadeiro ou Falso - Artes 6º Ano</p>
+            <div class="emoji-inicio">🎭🎨🖌️</div>
+            <p style="font-size: 1.1rem; color: #666; margin-bottom: 20px;">
+                Será que você conhece tudo sobre arte?<br>
+                Responda <strong>10 perguntas</strong> e descubra!
+            </p>
+            <button class="btn" onclick="iniciarJogo()">▶️ COMEÇAR</button>
+        </div>
+
+        <!-- TELA DO JOGO -->
+        <div id="telaJogo" class="screen">
+            <div class="top-bar">
+                <span>📝 Pergunta <span id="numPergunta">1</span>/10</span>
+                <span class="placar">⭐ <span id="pontuacao">0</span> pts</span>
+            </div>
+            
+            <div class="barra-progresso">
+                <div class="barra-preenchida" id="barraProgresso"></div>
+            </div>
+
+            <div class="pergunta-box">
+                <p class="pergunta-texto" id="perguntaTexto">Carregando...</p>
+            </div>
+
+            <div class="botoes-resposta">
+                <button class="btn btn-verdadeiro" onclick="responder(true)">✅ VERDADEIRO</button>
+                <button class="btn btn-falso" onclick="responder(false)">❌ FALSO</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- TELA FINAL -->
+        <div id="telaFim" class="screen">
+            <h1>🏆 Fim de Jogo! 🏆</h1>
+            <div class="resultado-emoji" id="resultadoEmoji">🎉</div>
+            <p class="resultado-titulo" id="resultadoTitulo">Parabéns!</p>
+            <div class="resultado-placar">
+                Você acertou <span id="acertosFinais">0</span> de 10!
+            </div>
+            <div class="estrelas" id="estrelas">⭐⭐⭐</div>
+            <p class="resultado-msg" id="resultadoMsg"></p>
+            <button class="btn btn-reiniciar" onclick="reiniciarJogo()">🔄 JOGAR NOVAMENTE</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== BANCO DE PERGUNTAS - ARTES 6º ANO =====
+        const perguntas = [
+            {
+                texto: "As cores primárias são vermelho, azul e amarelo.",
+                resposta: true,
+                explicacao: "Isso mesmo! As cores primárias são aquelas que não podem ser criadas pela mistura de outras cores."
+            },
+            {
+                texto: "O pontilhismo é uma técnica que usa apenas linhas retas.",
+                resposta: false,
+                explicacao: "Falso! O pontilhismo usa pequenos PONTOS de cor para formar imagens."
+            },
+            {
+                texto: "A Mona Lisa foi pintada por Leonardo da Vinci.",
+                resposta: true,
+                explicacao: "Correto! Leonardo da Vinci pintou a Mona Lisa entre 1503 e 1506."
+            },
+            {
+                texto: "O azul é uma cor quente.",
+                resposta: false,
+                explicacao: "Falso! O azul é uma cor FRIA. Cores quentes são vermelho, laranja e amarelo."
+            },
+            {
+                texto: "O Cubismo foi um movimento artístico que representava a realidade de forma geométrica.",
+                resposta: true,
+                explicacao: "Verdade! O Cubismo, com Picasso e Braque, usava formas geométricas para representar o mundo."
+            },
+            {
+                texto: "A escultura é uma arte que só pode ser feita com mármore.",
+                resposta: false,
+                explicacao: "Falso! A escultura pode ser feita com diversos materiais: madeira, argila, metal, pedra e até materiais reciclados."
+            },
+            {
+                texto: "O artista brasileiro Tarsila do Amaral pintou o quadro 'Abaporu'.",
+                resposta: true,
+                explicacao: "Verdade! 'Abaporu' (1928) é uma das obras mais famosas de Tarsila do Amaral."
+            },
+            {
+                texto: "O Teatro de Sombras usa apenas a luz do sol para criar as sombras.",
+                resposta: false,
+                explicacao: "Falso! O Teatro de Sombras pode usar várias fontes de luz, como lanternas, projetores e velas."
+            },
+            {
+                texto: "As cores secundárias são formadas pela mistura de duas cores primárias.",
+                resposta: true,
+                explicacao: "Correto! Ex: vermelho + amarelo = laranja; azul + amarelo = verde; vermelho + azul = roxo."
+            },
+            {
+                texto: "O grafite é uma forma de arte urbana que só pode ser feito em museus.",
+                resposta: false,
+                explicacao: "Falso! O grafite é uma arte urbana feita geralmente em muros e paredes das cidades."
+            }
+        ];
+
+        // ===== VARIÁVEIS DE ESTADO =====
+        let indiceAtual = 0;
+        let pontuacao = 0;
+        let acertos = 0;
+        let respondeu = false;
+
+        // ===== REFERÊNCIAS DOM =====
+        const telaInicio = document.getElementById('telaInicio');
+        const telaJogo = document.getElementById('telaJogo');
+        const telaFim = document.getElementById('telaFim');
+        const perguntaTexto = document.getElementById('perguntaTexto');
+        const feedback = document.getElementById('feedback');
+        const numPergunta = document.getElementById('numPergunta');
+        const pontuacaoEl = document.getElementById('pontuacao');
+        const barraProgresso = document.getElementById('barraProgresso');
+
+        // ===== FUNÇÕES =====
+        function mostrarTela(tela) {
+            document.querySelectorAll('.screen').forEach(t => t.classList.remove('active'));
+            tela.classList.add('active');
+        }
+
+        function iniciarJogo() {
+            indiceAtual = 0;
+            pontuacao = 0;
+            acertos = 0;
+            respondeu = false;
+            mostrarTela(telaJogo);
+            carregarPergunta();
+        }
+
+        function carregarPergunta() {
+            respondeu = false;
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+
+            const pergunta = perguntas[indiceAtual];
+            perguntaTexto.textContent = pergunta.texto;
+
+            // Atualizar UI
+            numPergunta.textContent = indiceAtual + 1;
+            pontuacaoEl.textContent = pontuacao;
+            barraProgresso.style.width = ((indiceAtual) / perguntas.length * 100) + '%';
+
+            // Reabilitar botões
+            document.querySelectorAll('.botoes-resposta .btn').forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            });
+        }
+
+        function responder(respostaUsuario) {
+            if (respondeu) return;
+            respondeu = true;
+
+            const pergunta = perguntas[indiceAtual];
+            const acertou = (respostaUsuario === pergunta.resposta);
+
+            // Desabilitar botões
+            document.querySelectorAll('.botoes-resposta .btn').forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                btn.style.cursor = 'not-allowed';
+            });
+
+            if (acertou) {
+                acertos++;
+                pontuacao += 10;
+                feedback.textContent = '🎉 ' + pergunta.explicacao;
+                feedback.className = 'feedback correto';
+            } else {
+                feedback.textContent = '❌ ' + pergunta.explicacao;
+                feedback.className = 'feedback errado';
+            }
+
+            // Atualizar placar
+            pontuacaoEl.textContent = pontuacao;
+            barraProgresso.style.width = ((indiceAtual + 1) / perguntas.length * 100) + '%';
+
+            // Próxima pergunta
+            setTimeout(() => {
+                indiceAtual++;
+                if (indiceAtual < perguntas.length) {
+                    carregarPergunta();
+                } else {
+                    finalizarJogo();
+                }
+            }, 2500);
+        }
+
+        function finalizarJogo() {
+            mostrarTela(telaFim);
+
+            document.getElementById('acertosFinais').textContent = acertos;
+
+            // Definir estrelas e mensagem
+            let estrelas = '';
+            let emoji = '';
+            let titulo = '';
+            let msg = '';
+
+            if (acertos === 10) {
+                estrelas = '⭐⭐⭐⭐⭐';
+                emoji = '🏆';
+                titulo = 'PERFEITO!';
+                msg = 'Uau! Você é um verdadeiro artista! Acertou tudo!';
+            } else if (acertos >= 8) {
+                estrelas = '⭐⭐⭐⭐';
+                emoji = '🎉';
+                titulo = 'Excelente!';
+                msg = 'Muito bem! Você conhece muito sobre arte!';
+            } else if (acertos >= 6) {
+                estrelas = '⭐⭐⭐';
+                emoji = '😊';
+                titulo = 'Muito Bom!';
+                msg = 'Bom trabalho! Continue estudando para melhorar ainda mais!';
+            } else if (acertos >= 4) {
+                estrelas = '⭐⭐';
+                emoji = '💪';
+                titulo = 'Bom esforço!';
+                msg = 'Você está no caminho certo! Revise o conteúdo e tente novamente.';
+            } else {
+                estrelas = '⭐';
+                emoji = '📚';
+                titulo = 'Continue tentando!';
+                msg = 'Não desanime! Estude mais sobre arte e tente de novo. Você vai conseguir!';
+            }
+
+            document.getElementById('estrelas').textContent = estrelas;
+            document.getElementById('resultadoEmoji').textContent = emoji;
+            document.getElementById('resultadoTitulo').textContent = titulo;
+            document.getElementById('resultadoMsg').textContent = msg;
+        }
+
+        function reiniciarJogo() {
+            mostrarTela(telaInicio);
+        }
+
+        // ===== SUPORTE A TECLADO =====
+        document.addEventListener('keydown', (e) => {
+            if (!telaJogo.classList.contains('active')) return;
+            if (respondeu) return;
+
+            if (e.key === '1' || e.key.toLowerCase() === 'v') {
+                responder(true);
+            } else if (e.key === '2' || e.key.toLowerCase() === 'f') {
+                responder(false);
+            }
+        });
+    </script>
+</body>
+</html>
